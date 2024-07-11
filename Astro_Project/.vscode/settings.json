@@ -56,5 +56,6 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Astro_Project.sln"
+    "dotnet.defaultSolution": "Astro_Project.sln",
+    "editor.codeLens": false
 }
