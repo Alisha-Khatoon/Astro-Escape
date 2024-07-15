@@ -6,6 +6,7 @@ public class camera : MonoBehaviour
     public float cameraOffset = 10f;
     public float aspectRatio = 0.625f;
     public float padding = 2f;
+    public float yOffset = 1;
 
     void Start()
     {
@@ -18,7 +19,7 @@ public class camera : MonoBehaviour
 
     void RepositionCamera(float x, float y)
     {
-        Vector3 tempPosition = new Vector3(x / 2f, y / 2f, -cameraOffset);
+        Vector3 tempPosition = new Vector3(x / 2f, y / 2f + yOffset , -cameraOffset);
         transform.position = tempPosition;
 
         float orthoSize;

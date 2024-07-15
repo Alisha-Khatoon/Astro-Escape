@@ -42,13 +42,7 @@ public class dot : MonoBehaviour
         isAdjBomb = false;
         board = FindObjectOfType<Board>();
         findMatches = FindObjectOfType<FindMatches>();
-        // targetX = (int)transform.position.x;
-        // targetY = (int)transform.position.y;
-        // row = targetY;
-        // column = targetX;
-        // previousRow = row;
-        // previousColumn = column; 
-    }
+        }
 
     //for testing and debug only
     private void OnMouseOver()
@@ -76,7 +70,7 @@ public class dot : MonoBehaviour
             //Move towards the target
             tempPosition = new Vector2(targetX, transform.position.y);
             transform.position = Vector2.Lerp(transform.position, tempPosition, .4f);
-        findMatches.FindAllMatches();
+            findMatches.FindAllMatches();
         }
         else
         {

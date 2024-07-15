@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Unity.VisualScripting;
+using UnityEditor;
+using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -9,20 +11,6 @@ public enum GameState{
     wait, 
     move
 }
-
-public enum TileKind{
-    Breakable,
-    Blank,
-    Normal
-}
-
-[System.Serializable]
-public class TileType{
-    public int x;
-    public int y;
-    public TileKind tileKind;
-}
-
 public class Board : MonoBehaviour
 {
     public GameState currentState = GameState.move;
@@ -32,14 +20,16 @@ public class Board : MonoBehaviour
     public GameObject tilePrefab;
     public GameObject[] dots;
     public GameObject destroyEffect;
-    public TileType[] boardLayout;
     private bgTile[,] allTiles;
     public GameObject[,] allDots;
     public dot currentDot;
     private FindMatches findMatches;
-
+    public int basePieceValue = 20;
+    private int streakValue = 1;
+    private script scoreManager;
 
     void Start(){
+        scoreManager = FindObjectOfType<script>();
         findMatches = FindObjectOfType<FindMatches>();
         allTiles = new bgTile[width, height];
         allDots = new GameObject[width, height];
@@ -155,6 +145,7 @@ public class Board : MonoBehaviour
             GameObject particle = Instantiate(destroyEffect, allDots[column, row].transform.position, Quaternion.identity);
             Destroy(particle, .5f);
             Destroy(allDots[column, row]);
+            scoreManager.IncreaseScore(basePieceValue * streakValue);
             allDots[column, row] = null;
         }
 
@@ -216,13 +207,113 @@ public class Board : MonoBehaviour
         Refillboard();
         yield return new WaitForSeconds(.5f);
         while(MatchesOnBoard()){
+            streakValue ++ ;
             yield return new WaitForSeconds(.5f);
             DestroyMatches();
         }
         findMatches.currentMatches.Clear();
         currentDot = null;
         yield return new WaitForSeconds(.5f);
+        if(IsDeadLocked())
+        {
+            ShuffleBoard();
+            Debug.Log("DeadLock");
+        }
         currentState = GameState.move;
+        streakValue = 1;
     }
+
+    private void SwitchPieces(int column, int row, Vector2 direction){
+        GameObject holder = allDots[column + (int)direction.x , row + (int)direction.y] as GameObject;
+        allDots[column + (int)direction.x, row + (int)direction.y] = allDots[column, row];
+        allDots[column, row] = holder;
+    }
+    private bool CheckForMatches(){
+        for(int i = 0; i< width; i++){
+            for(int j = 0; j< height; j++){
+                if(allDots[i, j] != null){
+                    if(i < width - 2){
+                        if(allDots[i + 1, j] != null && allDots[i + 2, j] != null){
+                            if(allDots[i + 1, j].tag == allDots[i, j].tag && allDots[i + 2,j].tag == allDots[i, j].tag){
+                                return true; 
+                            } 
+                        }
+                    }
+                    if( j < height - 2){
+                        if (allDots[i, j + 1] != null && allDots[i, j + 2] != null){
+                            if(allDots[i, j + 1].tag == allDots[i, j].tag && allDots[i, j + 2].tag == allDots[i, j].tag){
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private bool SwitchAndCheck(int column, int row, Vector2 direction){
+        SwitchPieces(column, row, direction);
+        if(CheckForMatches()){
+            SwitchPieces(column, row, direction);
+            return true;
+        }
+        SwitchPieces(column, row, direction);
+        return false;
+
+
+    }
+    private bool IsDeadLocked(){
+        for(int i = 0; i < width; i++){
+            for(int j = 0; j< height; j++){
+                if(allDots[i, j] != null){
+                    if(i < width - 1){
+                        if(SwitchAndCheck(i, j, Vector2.right)){
+                            return false;
+                        }
+                    }
+                    if(j < height - 1){
+                        if(SwitchAndCheck(i, j, Vector2.up)){
+                            return false;
+                        }
+                    }
+                }
+
+            }
+
+        }
+        return true;
+    }
+    private void ShuffleBoard(){
+        List<GameObject> newBoard = new List<GameObject>();
+        for(int i = 0; i< width; i++){
+            for(int j = 0; j< height; j++){
+                if(allDots[i, j] != null){
+                    newBoard.Add(allDots[i,j]);
+                }
+            }
+        }
+        for(int i = 0; i< width; i++){
+            for(int j = 0; j< height; j++){
+                int pieceToUse = Random.Range(0, newBoard.Count);
+                int maxIterations = 0;
+                while(MatchesAt(i, j, newBoard[pieceToUse]) && maxIterations < 100){
+                    pieceToUse = Random.Range(0, newBoard.Count);
+                    maxIterations++;
+                    Debug.Log(maxIterations);
+                }
+                dot piece = newBoard[pieceToUse].GetComponent<dot>();
+                maxIterations = 0;
+                piece.column = i;
+                piece.row = j;
+                allDots[i, j] = newBoard[pieceToUse];
+                newBoard.Remove(newBoard[pieceToUse]);
+            }
+        }
+        if(IsDeadLocked()){
+            ShuffleBoard();
+        }
+    }
+
 
 }
