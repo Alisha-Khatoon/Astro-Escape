@@ -14,6 +14,7 @@ public class dot : MonoBehaviour
     public int targetY;
     public bool isMatched = false;
 
+    private hintManager hintManager;
     private FindMatches findMatches;
     private Board board;
     public GameObject otherDot;
@@ -39,7 +40,10 @@ public class dot : MonoBehaviour
     {
         isColumnBomb = false;
         isRowBomb = false;
+        isColorBomb = false;
         isAdjBomb = false;
+        hintManager = FindObjectOfType<hintManager>();
+
         board = FindObjectOfType<Board>();
         findMatches = FindObjectOfType<FindMatches>();
         }
@@ -48,9 +52,9 @@ public class dot : MonoBehaviour
     private void OnMouseOver()
     {
         if(Input.GetMouseButtonDown(1)){
-            isAdjBomb = true;
-            GameObject marker = Instantiate(adjMarker, transform.position, Quaternion.identity);
-            marker.transform.parent = this.transform;
+            isColorBomb = true;
+            GameObject color = Instantiate(colorBomb, transform.position, Quaternion.identity);
+            color.transform.parent = this.transform;
 
         }
     }
@@ -125,6 +129,9 @@ public class dot : MonoBehaviour
 
     private void OnMouseDown()
     {
+        if(hintManager != null){
+            hintManager.DestroyHint();
+        }
         if( board.currentState == GameState.move){
             firstTouchPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         }
@@ -207,7 +214,8 @@ public class dot : MonoBehaviour
                 {
                     leftDot1.GetComponent<dot>().isMatched = true;
                     rightDot1.GetComponent<dot>().isMatched = true;
-                    isMatched = true;
+                        isMatched = true;
+                   
                 }
             }
         }
@@ -220,7 +228,9 @@ public class dot : MonoBehaviour
                 {
                     upDot1.GetComponent<dot>().isMatched = true;
                     downDot1.GetComponent<dot>().isMatched = true;
-                    isMatched = true;
+                    if(!isColorBomb){
+                        isMatched = true;
+                    }
                 }
             }
         }
@@ -239,6 +249,7 @@ public class dot : MonoBehaviour
         isColorBomb = true;
         GameObject color = Instantiate(colorBomb, transform.position, Quaternion.identity);
         color.transform.parent = this.transform;
+        this.gameObject.tag = "Color";
     }
     public void MakeAdjBomb(){
         isAdjBomb = true;

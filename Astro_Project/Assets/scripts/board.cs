@@ -27,6 +27,8 @@ public class Board : MonoBehaviour
     public int basePieceValue = 20;
     private int streakValue = 1;
     private script scoreManager;
+    public float refillDelay = 0.5f;
+    public int[] scoreGoals;
 
     void Start(){
         scoreManager = FindObjectOfType<script>();
@@ -175,7 +177,7 @@ public class Board : MonoBehaviour
             }
             nullCount = 0;
         } 
-        yield return new WaitForSeconds(.2f);
+        yield return new WaitForSeconds(refillDelay * 0.5f);
         StartCoroutine(FillBoardCo());
     }
     private void Refillboard(){
@@ -184,6 +186,12 @@ public class Board : MonoBehaviour
                 if (allDots[i,j] == null){
                     Vector2 tempPosition = new Vector2(i, j + offSet);
                     int dotToUse = Random.Range(0, dots.Length);
+                    int maxIterations = 0;
+                    while(MatchesAt(i, j, dots[dotToUse]) && maxIterations < 100){
+                        maxIterations ++;
+                        dotToUse = Random.Range(0, dots.Length);
+                    }
+                    maxIterations = 0;
                     GameObject piece = Instantiate(dots[dotToUse], tempPosition, Quaternion.identity);
                     allDots[i, j] = piece;
                     piece.GetComponent<dot>().row = j;
@@ -205,15 +213,15 @@ public class Board : MonoBehaviour
     }
     private IEnumerator FillBoardCo(){
         Refillboard();
-        yield return new WaitForSeconds(.5f);
+        yield return new WaitForSeconds(refillDelay);
         while(MatchesOnBoard()){
             streakValue ++ ;
-            yield return new WaitForSeconds(.5f);
             DestroyMatches();
+            yield return new WaitForSeconds(2 * refillDelay);
         }
         findMatches.currentMatches.Clear();
         currentDot = null;
-        yield return new WaitForSeconds(.5f);
+        yield return new WaitForSeconds(refillDelay);
         if(IsDeadLocked())
         {
             ShuffleBoard();
@@ -252,7 +260,7 @@ public class Board : MonoBehaviour
         return false;
     }
 
-    private bool SwitchAndCheck(int column, int row, Vector2 direction){
+    public bool SwitchAndCheck(int column, int row, Vector2 direction){
         SwitchPieces(column, row, direction);
         if(CheckForMatches()){
             SwitchPieces(column, row, direction);
@@ -285,6 +293,7 @@ public class Board : MonoBehaviour
         return true;
     }
     private void ShuffleBoard(){
+        // yield return new WaitForSeconds(0.5f);
         List<GameObject> newBoard = new List<GameObject>();
         for(int i = 0; i< width; i++){
             for(int j = 0; j< height; j++){
