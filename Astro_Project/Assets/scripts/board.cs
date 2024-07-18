@@ -9,11 +9,14 @@ using UnityEngine.UIElements;
 
 public enum GameState{
     wait, 
-    move
+    move,
+    win,
+    lose,
+    pause
 }
 public class Board : MonoBehaviour
 {
-    public GameState currentState = GameState.move;
+    public GameState currentState ;
     public int width;
     public int height;
     public int offSet;
@@ -27,15 +30,19 @@ public class Board : MonoBehaviour
     public int basePieceValue = 20;
     private int streakValue = 1;
     private script scoreManager;
+    private soundManager soundManager;
     public float refillDelay = 0.5f;
     public int[] scoreGoals;
 
     void Start(){
+        currentState = GameState.pause;
+        soundManager = FindObjectOfType<soundManager>();
         scoreManager = FindObjectOfType<script>();
         findMatches = FindObjectOfType<FindMatches>();
         allTiles = new bgTile[width, height];
         allDots = new GameObject[width, height];
         SetUp();
+        currentState = GameState.pause;
     }
     private void SetUp(){
         for (int i = 0; i< width; i++){
@@ -144,6 +151,9 @@ public class Board : MonoBehaviour
             if(findMatches.currentMatches.Count >= 4){
                 checkToMakeBombs();
             }
+            if(soundManager != null){
+                soundManager.PlayRandomNoise();
+            }
             GameObject particle = Instantiate(destroyEffect, allDots[column, row].transform.position, Quaternion.identity);
             Destroy(particle, .5f);
             Destroy(allDots[column, row]);
@@ -153,13 +163,13 @@ public class Board : MonoBehaviour
 
     }
     public void DestroyMatches(){
-    for(int i = 0; i < width; i++){
-        for (int j = 0; j < height; j++){
-            if (allDots[i, j] != null && allDots[i, j].GetComponent<dot>().isMatched){
-                DestroyMatchesAt(i, j);
+        for(int i = 0; i < width; i++){
+            for (int j = 0; j < height; j++){
+                if (allDots[i, j] != null && allDots[i, j].GetComponent<dot>().isMatched){
+                    DestroyMatchesAt(i, j);
+                }
             }
         }
-    }
     findMatches.currentMatches.Clear();
     StartCoroutine(DecreaseRowCo());
 }
@@ -227,7 +237,8 @@ public class Board : MonoBehaviour
             ShuffleBoard();
             Debug.Log("DeadLock");
         }
-        currentState = GameState.move;
+        if(currentState != GameState.lose){            
+            currentState = GameState.move;}
         streakValue = 1;
     }
 

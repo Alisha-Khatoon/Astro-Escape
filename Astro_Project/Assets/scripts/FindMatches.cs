@@ -178,12 +178,6 @@ public class FindMatches : MonoBehaviour
         if(board.currentDot != null){
             if(board.currentDot.isMatched){
                 board.currentDot.isMatched = false;
-                // int typeOfBomb = Random.Range(0, 100);
-                // if(typeOfBomb < 50){
-                //     board.currentDot.MakeRowBomb();
-                // }else if(typeOfBomb >= 50){
-                //     board.currentDot.MakeColumnBomb();
-                // }
                 if ((board.currentDot.swipeAngle > -45 && board.currentDot.swipeAngle <= 45) || (board.currentDot.swipeAngle < -135 || board.currentDot.swipeAngle >= 135)){
                     board.currentDot.MakeRowBomb();
                 }

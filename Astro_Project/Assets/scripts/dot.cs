@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 public class dot : MonoBehaviour
 {
@@ -14,6 +15,7 @@ public class dot : MonoBehaviour
     public int targetY;
     public bool isMatched = false;
 
+    private EndGameManager endGameManager;
     private hintManager hintManager;
     private FindMatches findMatches;
     private Board board;
@@ -42,8 +44,9 @@ public class dot : MonoBehaviour
         isRowBomb = false;
         isColorBomb = false;
         isAdjBomb = false;
-        hintManager = FindObjectOfType<hintManager>();
 
+        endGameManager = FindObjectOfType<EndGameManager>();
+        hintManager = FindObjectOfType<hintManager>();
         board = FindObjectOfType<Board>();
         findMatches = FindObjectOfType<FindMatches>();
         }
@@ -82,7 +85,8 @@ public class dot : MonoBehaviour
             tempPosition = new Vector2(targetX, transform.position.y);
             transform.position = tempPosition;
             board.allDots[column, row] = this.gameObject;
-            board.currentState = GameState.move;
+            if(board.currentState != GameState.lose){            
+                board.currentState = GameState.move;}
         }
         if (Mathf.Abs(targetY - transform.position.y) > .1)
         {
@@ -97,7 +101,8 @@ public class dot : MonoBehaviour
             tempPosition = new Vector2(transform.position.x, targetY);
             transform.position = tempPosition;
             board.allDots[column, row] = this.gameObject;
-            board.currentState = GameState.move;
+            if(board.currentState != GameState.lose){            
+                board.currentState = GameState.move;}
         }
     }
 
@@ -119,8 +124,14 @@ public class dot : MonoBehaviour
                 column = previousColumn;
                 yield return new WaitForSeconds(.5f);
                 board.currentDot = null;
-                board.currentState = GameState.move;
+                if(board.currentState != GameState.lose){            
+                    board.currentState = GameState.move;}
             }else{
+                if(endGameManager != null){
+                    if(endGameManager.requirements.gameType == GameType.Moves){
+                       endGameManager.decreaseCounterValue();
+                    }
+                }
                 board.DestroyMatches();
         }
             //otherDot = null;
@@ -153,7 +164,8 @@ public class dot : MonoBehaviour
             MovePieces();
             board.currentDot = this;
         }else{
-            board.currentState = GameState.move;
+            if(board.currentState != GameState.lose){            
+                board.currentState = GameState.move;}
         }
     }
 
@@ -214,8 +226,7 @@ public class dot : MonoBehaviour
                 {
                     leftDot1.GetComponent<dot>().isMatched = true;
                     rightDot1.GetComponent<dot>().isMatched = true;
-                        isMatched = true;
-                   
+                        isMatched = true;                   
                 }
             }
         }
