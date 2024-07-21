@@ -75,8 +75,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: a4f542dcf19efa6458c2b248d81502ac, type: 3}
-  m_Color: {r: 0.08627451, g: 0.5372549, b: 0.5647059, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 5c041a7f001fdf6429593e3f82194c78, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -105,12 +105,17 @@ MonoBehaviour:
   targetX: 0
   targetY: 0
   isMatched: 0
+  otherDot: {fileID: 0}
   swipeAngle: 0
   swipeResist: 1
+  isColorBomb: 0
   isColumnBomb: 0
   isRowBomb: 0
+  isAdjBomb: 0
+  adjMarker: {fileID: 3370534115903110206, guid: 9c56061af5f6ea84795acd4f4e7ea626, type: 3}
   rowArrow: {fileID: 1760158975008633136, guid: 7e09a9d87f887ca469716c15a5d9743a, type: 3}
   columnArrow: {fileID: 862216708824071373, guid: 8721b03c95c3c2a4088399b7605044d2, type: 3}
+  colorBomb: {fileID: 4641061568504886391, guid: 2f5d082200392324b8cc2af3dc074273, type: 3}
 --- !u!58 &2755744264475109112
 CircleCollider2D:
   m_ObjectHideFlags: 0
