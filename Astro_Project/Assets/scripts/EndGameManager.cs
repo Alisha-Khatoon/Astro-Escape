@@ -61,7 +61,8 @@ public class EndGameManager : MonoBehaviour
         board.currentState = GameState.win;
         currentCounterValue = 0;
         counter.text = "" + currentCounterValue;
-        
+        fadePanelController fade = FindObjectOfType<fadePanelController>();
+        fade.GameOver();
     }
   
   public void LoseGame(){
