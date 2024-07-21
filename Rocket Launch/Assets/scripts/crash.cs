@@ -30,19 +30,5 @@ public class RocketCrash : MonoBehaviour
         {
             audioSource.Play();
         }
-
-        // Animator animator = GetComponent<Animator>();
-        // if (animator != null)
-        // {
-        //     animator.SetTrigger("Crash");
-        // }
-
-        // Rigidbody2D rb = GetComponent<Rigidbody2D>();
-        // if (rb != null)
-        // {
-        //     rb.velocity = Vector2.zero;
-        //     rb.angularVelocity = 0f;
-        //     rb.simulated = false; // Disable physics simulation
-        // }
     }
 }
