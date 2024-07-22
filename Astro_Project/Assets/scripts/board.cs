@@ -31,11 +31,13 @@ public class Board : MonoBehaviour
     private int streakValue = 1;
     private script scoreManager;
     private soundManager soundManager;
+    private GoalManager goalManager;
     public float refillDelay = 0.5f;
     public int[] scoreGoals;
 
     void Start(){
         currentState = GameState.pause;
+        goalManager = FindObjectOfType<GoalManager>();
         soundManager = FindObjectOfType<soundManager>();
         scoreManager = FindObjectOfType<script>();
         findMatches = FindObjectOfType<FindMatches>();
@@ -150,6 +152,10 @@ public class Board : MonoBehaviour
         if(allDots[column, row].GetComponent<dot>().isMatched){
             if(findMatches.currentMatches.Count >= 4){
                 checkToMakeBombs();
+            }
+            if(goalManager != null){
+                goalManager.CompareGoal(allDots[column, row].tag.ToString());
+                goalManager.UpdateGoals();
             }
             if(soundManager != null){
                 soundManager.PlayRandomNoise();
