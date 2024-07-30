@@ -23,7 +23,7 @@ public class ScoreManager : MonoBehaviour
             score += 1 * Time.deltaTime;
             UpdateScoreText();
 
-            if (score >= 60)
+            if (score >= 20)
             {
                 StopGame();
             }
